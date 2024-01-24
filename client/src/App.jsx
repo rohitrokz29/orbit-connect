@@ -59,8 +59,17 @@ function App() {
     
       {error && <div>{error}</div>}
       <button
-        onClick={() => {
-          socket.emit('room:create', { userId: organiser });
+        onClick={async() => {
+          try {
+            let res=await fetch('http://localhost:3000/createRoom',{
+              method:"POST",
+              body:{organiser,data:new Date()}
+            }).then(response=>response.json())
+            console.log(res)
+          } catch (error) {
+            
+          }
+          socket.emit('room:create', {  organiser,password });
           console.log({ organiser, room, password, user, error, msg })
 
         }}
