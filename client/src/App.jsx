@@ -19,9 +19,11 @@ function App() {
       console.log({ organiser, room, password, user, error, msg })
     })
     socket.on('room:start', (data) => {
+
+      console.log(data)
       setMsg(data['message']);
 
-      console.log({ organiser, room, password, user, error, msg })
+      console.log({ organiserId:organiser, room, password, user, error, msg })
 
     })
     socket.on('room:new_user', (data) => {
@@ -41,7 +43,7 @@ function App() {
         setroom(room);
       })
       socket.off('room:start', (data) => {
-        setMsg(data['message']);
+        setError(data['message']);
       })
       socket.off('room:new_user', (data) => {
         setMsg(`${data['user']} joined`)
@@ -75,7 +77,7 @@ function App() {
         }}
       >Create Rooom</button>
       <button onClick={() => {
-        socket.emit('room:start', { room, organiser, password });
+        socket.emit('room:start', { room, organiserId:organiser, password });
         console.log({ organiser, room, password, user, error, msg })
 
       }}>Start Meet</button>

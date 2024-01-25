@@ -5,11 +5,6 @@ var roomId = "ABC123";
 var roomPassword = "Rohit";
 
 userRouter.post('/createRoom', async (req, res) => {
-    let createdRoom = await CreateRoom(req.body);
-    if (createdRoom) {
-        res.status(200).json(createdRoom);
-    }
-    else res.json({ msg: "NONE" })
-
+    await CreateRoom({ ...req.body, res });
 })
 module.exports = userRouter
