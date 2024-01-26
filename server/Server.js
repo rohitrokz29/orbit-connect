@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
 const { connectDatabase } = require('./db/db.connect');
 const { Connection } = require('./socketMethods/Connection');
-const { StartRoom } = require('./db/db.rooms');
+const { StartRoom, JoinRoom } = require('./db/db.rooms');
 
 
 const app = express();
@@ -30,19 +30,21 @@ app.get('/', (req, res) => {
  */
 io.on('connection', socket => {
     console.log(socket.id);
-    socket.on('room:start', ({ room, organiserId, password }) => {
+    socket.on('room:start', ({ room, userId, password }) => {
         try {
-            StartRoom({ room, organiserId, password, socket });
+            StartRoom({ room, organiserId: userId, password, socket });
         } catch (error) {
+            console.log(error)
             socket.emit("room:error", { message: error.message })
         }
     })
     socket.on('room:join', ({ room, password, user }) => {
-        if (room !== roomId && password !== roomPassword) {
-            socket.emit("room:error", { message: "Wrong Details" })
+        try {
+            JoinRoom({ room, password, user, socket });
+        } catch (error) {
+            console.log(error)
+            socket.emit("room:error", { message: error.message })
         }
-        socket.join(room);
-        socket.broadcast.to(room).emit("room:new_user", { user })
     })
     socket.on('room:message', ({ room, message, user }) => {
         socket.broadcast.to(room).emit('room:message', { message, user })

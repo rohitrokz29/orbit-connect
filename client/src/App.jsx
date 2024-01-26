@@ -19,22 +19,23 @@ function App() {
       console.log({ organiser, room, password, user, error, msg })
     })
     socket.on('room:start', (data) => {
-
       console.log(data)
       setMsg(data['message']);
 
-      console.log({ organiserId:organiser, room, password, user, error, msg })
+      // console.log({ organiserId:organiser, room, password, user, error, msg })
 
     })
     socket.on('room:new_user', (data) => {
       setMsg(`${data['user']} joined`)
-
-      console.log({ organiser, room, password, user, error, msg })
+      console.log(data)
     })
-    socket.on('room:error', (data) => setError(data['message']))
-    socket.on("room:message",({message,user})=>{
-      setMsg(message+user);
-      console.log({message,user})
+    socket.on('room:error', (data) => {
+      console.log('error')
+      setError(data['message'])
+    })
+    socket.on("room:message", ({ message, user }) => {
+      setMsg(message + user);
+      console.log({ message, user })
     })
     return () => {
 
@@ -58,38 +59,38 @@ function App() {
       <input type="text" name="" id="" value={room} placeholder='room' onChange={(e) => setroom(e.target.value)} />
       <input type="text" name="" id="" value={password} placeholder='password' onChange={(e) => setPassword(e.target.value)} />
       <input type="text" name="" id="" value={user} placeholder='user' onChange={(e) => setUser(e.target.value)} />
-    
+
       {error && <div>{error}</div>}
       <button
-        onClick={async() => {
+        onClick={async () => {
           try {
-            let res=await fetch('http://localhost:3000/createRoom',{
-              method:"POST",
-              body:{organiser,data:new Date()}
-            }).then(response=>response.json())
+            let res = await fetch('http://localhost:3000/createRoom', {
+              method: "POST",
+              body: { organiser, data: new Date() }
+            }).then(response => response.json())
             console.log(res)
           } catch (error) {
-            
+
           }
-          socket.emit('room:create', {  organiser,password });
+          socket.emit('room:create', { organiser, password });
           console.log({ organiser, room, password, user, error, msg })
 
         }}
       >Create Rooom</button>
       <button onClick={() => {
-        socket.emit('room:start', { room, organiserId:organiser, password });
-        console.log({ organiser, room, password, user, error, msg })
+        socket.emit('room:start', { room, userId: organiser, password });
+        console.log("ROOM-START")
 
       }}>Start Meet</button>
       <button onClick={() => {
         socket.emit('room:join', { user, room, password })
-        console.log({ organiser, room, password, user, error, msg })
+        console.log("ROOM_JOIN")
 
       }}>Join Meet</button>
 
-  <input type="text" name="" id="" value={msg} placeholder='message' onChange={(e) => setMsg(e.target.value)} />
-      <button type="button" onClick={()=>{
-        socket.emit('room:message',{room,message:msg,user});
+      <input type="text" name="" id="" value={msg} placeholder='message' onChange={(e) => setMsg(e.target.value)} />
+      <button type="button" onClick={() => {
+        socket.emit('room:message', { room, message: msg, user });
       }}>Send Message</button>
     </>
   )
