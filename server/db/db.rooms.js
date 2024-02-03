@@ -1,10 +1,11 @@
 const { database } = require("../db/db.connect")
 const { nanoid } = require("nanoid");
+const { SendMail } = require("../middlewares/mail");
 
 /**
  * @param {Objecy} client
  * @param {String} organiserId
- * @param {Date} date
+ * @param {String} date
  * @param {Object} res
  * @returns
  */
@@ -15,11 +16,15 @@ const CreateRoom = async ({ organiser, date, res }) => {
         const formattedDate = date.slice(0, 19).replace('T', ' ');
         console.log({ room, password, formattedDate, organiser, date })
         // console.log({date})
-        database.query(`INSERT INTO meetings VALUES('${room}','${formattedDate}','${organiser}','${password}') ;`, (err, result) => {
+        database.query(`INSERT INTO meetings VALUES('${room}','${formattedDate}','${organiser}','${password}') ;`, 
+        (err, result) => {
             // console.log(result)
             console.log(err)
             if (err) res.status(500).json({ message: err.message })
-            else if (result?.affectedRows) res.status(200).json({ created: true, message: "Succesfully Booked Session" });
+            else if (result?.affectedRows===1){
+                res.status(200).json({ created: true, message: "Succesfully Booked Session" });
+                SendMail({room,password,date,organiser})
+            }
             else res.status(400).json({ message: "Session Booking Failed" })
         });
     } catch (error) {
