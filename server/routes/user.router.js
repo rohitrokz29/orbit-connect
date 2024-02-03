@@ -1,10 +1,12 @@
 const { Router } = require("express");
 const { CreateRoom } = require("../db/db.rooms");
 const userRouter = Router();
-var roomId = "ABC123";
-var roomPassword = "Rohit";
 
-userRouter.post('/createRoom', async (req, res) => {
+userRouter.post('/room/create', async (req, res) => {
+    console.log(req.body)
     await CreateRoom({ ...req.body, res });
 })
+
+
+
 module.exports = userRouter

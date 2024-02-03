@@ -8,19 +8,22 @@ const { nanoid } = require("nanoid");
  * @param {Object} res
  * @returns
  */
-const CreateRoom = async ({ organiserId, date, res }) => {
+const CreateRoom = async ({ organiser, date, res }) => {
     try {
         const room = nanoid(10);
         const password = nanoid(12);
-        console.log({ room, password })
-        const formattedDate = (new Date(date)).toISOString().slice(0, 19).replace('T', ' ');
-        database.query(`INSERT INTO meetings VALUES('${room}','${formattedDate}','${organiserId}','${password}') ;`, (err, result) => {
-            console.log(result)
+        const formattedDate = date.slice(0, 19).replace('T', ' ');
+        console.log({ room, password, formattedDate, organiser, date })
+        // console.log({date})
+        database.query(`INSERT INTO meetings VALUES('${room}','${formattedDate}','${organiser}','${password}') ;`, (err, result) => {
+            // console.log(result)
+            console.log(err)
             if (err) res.status(500).json({ message: err.message })
             else if (result?.affectedRows) res.status(200).json({ created: true, message: "Succesfully Booked Session" });
             else res.status(400).json({ message: "Session Booking Failed" })
         });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Server Error" });
     }
 }
@@ -34,8 +37,8 @@ const CreateRoom = async ({ organiserId, date, res }) => {
 * @param {String} room 
 * @param {String} password
 * @param {Object} socket
- @returns 
- */
+* @returns 
+*/
 const StartRoom = async ({ organiserId, room, password, socket }) => {
     try {
         if (socket.adapter.rooms.has(room)) {
@@ -77,7 +80,7 @@ const StartRoom = async ({ organiserId, room, password, socket }) => {
  */
 const JoinRoom = ({ room, password, user, socket }) => {
     try {
-        //adapter xontains all room in pattaerm of Map<String(ROOMID),Set<String(SOCKET ID)>>
+        //adapter contains all room in pattaerm of Map<String(ROOMID),Set<String(SOCKET ID)>>
         //checking if meeting started or not
         console.log(socket.adapter.rooms)
         if (!socket.adapter.rooms.has(room)) {
@@ -107,6 +110,7 @@ const JoinRoom = ({ room, password, user, socket }) => {
         socket.emit('room:error', { message: "Server Error" });
     }
 }
+
 
 module.exports = {
     CreateRoom,

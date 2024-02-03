@@ -11,19 +11,13 @@ function App() {
   const [user, setUser] = useState("");
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
-  useEffect(() => {
 
-    socket.on('room:create', ({ room, password }) => {
-      setPassword(password);
-      setroom(room);
-      console.log({ organiser, room, password, user, error, msg })
-    })
+
+  useEffect(() => {
     socket.on('room:start', (data) => {
       console.log(data)
       setMsg(data['message']);
-
       // console.log({ organiserId:organiser, room, password, user, error, msg })
-
     })
     socket.on('room:new_user', (data) => {
       setMsg(`${data['user']} joined`)
@@ -37,12 +31,8 @@ function App() {
       setMsg(message + user);
       console.log({ message, user })
     })
-    return () => {
 
-      socket.off('room:create', ({ room, password }) => {
-        setPassword(password);
-        setroom(room);
-      })
+    return () => {
       socket.off('room:start', (data) => {
         setError(data['message']);
       })
@@ -64,16 +54,18 @@ function App() {
       <button
         onClick={async () => {
           try {
-            let res = await fetch('http://localhost:3000/createRoom', {
+            let res = await fetch('http://localhost:3000/room/create', {
               method: "POST",
-              body: { organiser, data: new Date() }
+              body: JSON.stringify({ organiser, date: (new Date()).toISOString() }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
             }).then(response => response.json())
             console.log(res)
           } catch (error) {
 
           }
-          socket.emit('room:create', { organiser, password });
-          console.log({ organiser, room, password, user, error, msg })
+          console.log({ organiser, room, date: (new Date().toISOString()), password, user, error, msg })
 
         }}
       >Create Rooom</button>

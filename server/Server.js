@@ -11,6 +11,7 @@ const { StartRoom, JoinRoom } = require('./db/db.rooms');
 const app = express();
 app.use(require('cors')())
 app.use(express.urlencoded());
+app.use(express.json());
 dotenv.config({ path: __dirname + "./.env" })
 app.use(bodyParser.json());
 const socketServer = createServer(app);
@@ -29,13 +30,16 @@ app.get('/', (req, res) => {
  * Check roomid and password from database befor joining the meet and all other detils and add auth for socket
  */
 io.on('connection', socket => {
+    /**
+     * TODO ADD VEDIO CONFERECE FUNCTIONALITY
+     */
     console.log(socket.id);
     socket.on('room:start', ({ room, userId, password }) => {
         try {
             StartRoom({ room, organiserId: userId, password, socket });
         } catch (error) {
             console.log(error)
-            socket.emit("room:error", { message: error.message })
+            socket.emit("room:error", { message: error.message });
         }
     })
     socket.on('room:join', ({ room, password, user }) => {
@@ -43,11 +47,23 @@ io.on('connection', socket => {
             JoinRoom({ room, password, user, socket });
         } catch (error) {
             console.log(error)
-            socket.emit("room:error", { message: error.message })
+            socket.emit("room:error", { message: error.message });
         }
     })
     socket.on('room:message', ({ room, message, user }) => {
-        socket.broadcast.to(room).emit('room:message', { message, user })
+        try {
+            socket.broadcast.to(room).emit('room:message', { message, user });
+        } catch (error) {
+            socket.emit('room:error', { message: "Message Not Sent" });
+        }
+    })
+    socket.on('room:leave', ({ room }) => {
+        try {
+            socket.leave(room);
+            socket.emit('room:leave', { message: "Conference Left Succesfully" });
+        } catch (error) {
+            socket.emit('room:error', { message: "Conferece Not Left" });
+        }
     })
 });
 
