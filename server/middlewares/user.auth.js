@@ -6,7 +6,7 @@ const UserAuth = (req, res, next) => {
         if (!accessToken) {
             return res.status(400).json({ message: "Signin First" });
         }
-        const result = jwt.verify(accessToken, process.env.ACCESS_JWT_SECRET)
+        const result = jwt.verify(accessToken, process.env.JWT_ACCESS_TOKEN_SECRET)
         if (result) {
             database.query(`SELECT COUNT(id) FROM user WHERE id='${result['id']}';`,
                 (err, result) => {

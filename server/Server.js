@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
  */
 io.on('connection', Connection);
 
-socketServer.listen(3000, () => {
+socketServer.listen(process.env.HOST_PORT, () => {
     connectDatabase();
     console.log('Running at port 3000');
 })

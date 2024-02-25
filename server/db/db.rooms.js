@@ -89,7 +89,7 @@ const JoinRoom = ({ room, password, user, socket }) => {
         //checking if meeting started or not
         console.log(socket.adapter.rooms)
         if (!socket.adapter.rooms.has(room)) {
-            console.log("ROOM  NOT  FOUND");;;;;
+            console.log("ROOM  NOT  FOUND");
             socket.emit('room:error', { message: "Meeting Not Started Yet!" });
             return;
         }
