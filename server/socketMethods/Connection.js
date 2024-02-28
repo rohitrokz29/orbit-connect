@@ -1,7 +1,5 @@
 const Connection = (socket) => {
-    /**
-   * TODO ADD VEDIO CONFERECE FUNCTIONALITY
-   */
+
     console.log(socket.id);
     socket.on('room:start', ({ room, userId, password }) => {
         try {
@@ -19,6 +17,14 @@ const Connection = (socket) => {
             socket.emit("room:error", { message: error.message });
         }
     })
+    socket.on('room:stream', ({ room, user, stream }) => {
+        try {
+            console.log("stream");
+            socket.broadcast.to(room).emit('room:stream', { user, stream });
+        } catch (error) {
+            socket.emit("room:error", { message: "Stream Error" });
+        }
+    })
     socket.on('room:message', ({ room, message, user }) => {
         try {
             socket.broadcast.to(room).emit('room:message', { message, user });
@@ -26,14 +32,15 @@ const Connection = (socket) => {
             socket.emit('room:error', { message: "Message Not Sent" });
         }
     })
-    socket.on('room:leave', ({ room }) => {
+    socket.on('room:leave', ({ room, user }) => {
         try {
             socket.leave(room);
-            socket.emit('room:leave', { message: "Conference Left Succesfully" });
+            socket.broadcast.to(room).emit('room:leave', { message: `${user} left` });
         } catch (error) {
             socket.emit('room:error', { message: "Conferece Not Left" });
         }
     })
+
 }
 
-module.exports={Connection}
+module.exports = { Connection }

@@ -1,19 +1,15 @@
 const { Router } = require("express");
 const { CreateRoom } = require("../db/db.rooms");
-const { Signup, Signin } = require('../db/db.user');
+const { Signup, Signin, SignOut } = require('../db/db.user');
+const { UserAuth } = require("../middlewares/user.auth");
 const userRouter = Router();
 
-userRouter.post('/room/create', async (req, res) => {
-    console.log(req.body)
-    await CreateRoom({ ...req.body, res });
-})
+userRouter.post('/room/create', UserAuth, CreateRoom);
 
-userRouter.post('/signup', async (req, res) => {
-    await Signup({ ...req.body, res });
-})
+userRouter.post('/signup', Signup);
 
-userRouter.post('/signin', async (req, res) => {
-    await Signin({...req.body,res});
-})
+userRouter.post('/signin', Signin);
+
+userRouter.delete('/signout', UserAuth, SignOut);
 
 module.exports = userRouter

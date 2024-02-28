@@ -2,7 +2,7 @@
 CREATE DATABASE orbit_connect;
 
 -- use mysql database
-USE DATABASE orbit_connect;
+USE  orbit_connect;
 
 -- Creating tables 
 -- user table to store user data
@@ -10,7 +10,7 @@ CREATE TABLE user(
     id VARCHAR(60) PRIMARY KEY,
     email VARCHAR(50) UNIQUE,
     name VARCHAR(30),
-    password VARCHAR(400),
+    password VARCHAR(400)
 );
 
 -- meetings table to store meetings data 

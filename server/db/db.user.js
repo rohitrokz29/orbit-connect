@@ -9,6 +9,7 @@ const cookieOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    signed: true,
     // secure: process.env.NODE_ENV === 'production',
     expires: new Date(Date.now() + 24 * 3600 * 1000)
 };
@@ -18,7 +19,8 @@ const cookieOptions = {
  * @param {String} password
  * @param {Object} res
  */
-const Signup = async ({ name, email, password, res }) => {
+const Signup = async (req, res) => {
+    const { name, email, password } = req.body;
     try {
         console.log({ name, email, password });
         console.log(validate(email));
@@ -35,6 +37,7 @@ const Signup = async ({ name, email, password, res }) => {
             database.query("INSERT INTO user VALUES (?,?,?,?);",
                 [id, email, name, hash],
                 (err, result) => {
+                    console.log(err)
                     console.log(result)
                     if (err) {
                         return res.status(400).json({ message: "Email Already Exist" });
@@ -47,7 +50,7 @@ const Signup = async ({ name, email, password, res }) => {
                     return res
                         .cookie('accessToken', CreateToken({ id }), cookieOptions)
                         .status(200)
-                        .json({ id })
+                        .json({ id });
                 }
             )
         })
@@ -64,23 +67,26 @@ const Signup = async ({ name, email, password, res }) => {
  * @param {String} password
  * @param {Object} res
  */
-const Signin = async ({ email, password, res }) => {
+const Signin = async (req, res) => {
     try {
+        const { email, password } = req.body
         console.log({ email, password });
         if (!email && !password) {
             return res.status(400).json({ message: "Invalid Details" });
         }
-        database.query(`SELECT id,password FROM user WHERE email='${email}';`,
+        database.query(`SELECT name,id,password FROM user WHERE email='${email}';`,
             (error, result) => {
                 if (error || result.length === 0) {
-                    return res.status(400).json({ message: "You have Not signed up yet!" });
+                    return res.status(404).json({ message: "You have Not signed up yet!" });
                 }
                 console.log(result)
                 if (bcrypt.compare(password, result[0]?.password)) {
+                    console.log("done")
+                    const token = CreateToken({ id: result[0].id })
                     return res
-                        .cookie("accessToken", CreateToken({ id: result[0].id }), cookieOptions)
+                        .cookie("accessToken", token, cookieOptions)
                         .status(200)
-                        .json({ email, id: result[0].id });
+                        .json({ id: result[0].id, name: result[0].name });
                 }
                 return res.status(400).json({ message: "Wrong Password" })
             })
@@ -90,7 +96,7 @@ const Signin = async ({ email, password, res }) => {
     }
 }
 
-const LogOut = async ({ email, res }) => {
+const SignOut = async (req, res) => {
     try {
         return res
             .clearCookie('accessToken')
@@ -103,5 +109,6 @@ const LogOut = async ({ email, res }) => {
 
 module.exports = {
     Signup,
-    Signin
+    Signin,
+    SignOut
 }
