@@ -4,10 +4,6 @@ const { database } = require('../db/db.connect');
 require("dotenv").config();
 const transporter = nodemailer.createTransport({
     service: process.env.NODEMAILER_SERVICE,
-    // host: "smtp.gmail.com",
-    // port: 587,
-    // ignoreTLS: false,
-    // secure: false,
     auth: {
         user: process.env.NODEMAILER_USER,
         pass: process.env.NODEMAILER_PASSWORD
@@ -21,11 +17,11 @@ const transporter = nodemailer.createTransport({
  * @param {String} password
  */
 
-//TODO: ERROR DURING SENDDING EMAIL
-const SendMail = ({ organiser, room, password, date }) => {
+const SendMail = async({ organiser, room, password, date }) => {
     console.log("SEND MAIL")
     console.log(transporter)
-    database.query("SELECT email FROM user WHERE id=?",
+    let status=false;
+    await database.query("SELECT email FROM user WHERE id=?",
         [organiser],
         (err, result) => {
             console.log(result[0])
@@ -37,15 +33,16 @@ const SendMail = ({ organiser, room, password, date }) => {
                 html: `Dear User,<br> Your Session has been booked. <br> <b>Conference ID: </b>${room} <br><b>Conference Password: </b>${password}<br><b>Date:</b> ${new Date(date).toISOString()}<br>Thank You,<br>Orbit Connect`
             };
 
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error('Error:', error);
-                    return process.exit(1);
-                }
-                console.log('Email sent:', info.response);
-            });
+            transporter.sendMail(mailOptions)
+            .then(info=>{
+                status=true;
+            })
+            .catch((err)=>{
+                status=false;
+            })
         }
     )
+        return status;
 
 }
 

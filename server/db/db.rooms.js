@@ -18,13 +18,14 @@ const CreateRoom = async (req, res) => {
         console.log({ room, password, formattedDate, organiser, date })
         // console.log({date})
         database.query(`INSERT INTO meetings VALUES('${room}','${formattedDate}','${organiser}','${password}') ;`,
-            (err, result) => {
+            async (err, result) => {
                 // console.log(result)
                 console.log(err)
                 if (err) res.status(500).json({ message: err.message })
                 else if (result?.affectedRows === 1) {
+                    const emailStatus=await SendMail({ room, password, date, organiser })
+                    if(!emailStatus) throw new Error("Mailer Error");
                     res.status(200).json({ created: true, message: "Succesfully Booked Session" });
-                    SendMail({ room, password, date, organiser })
                 }
                 else res.status(400).json({ message: "Session Booking Failed" })
             });
