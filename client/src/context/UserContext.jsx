@@ -16,11 +16,11 @@ export const UserState = ({ children }) => {
     console.log({ state, action });
     switch (action.type) {
       case "signin":
-        setIsSignedIn((isSignedIn) => !isSignedIn);
+        setIsSignedIn((isSignedIn) => true);
         return { user: action.payload };
       case "signout":
         localStorage.clear();
-        setIsSignedIn((isSignedIn) => !isSignedIn);
+        setIsSignedIn((isSignedIn) => false);
         return { user: null };
       default:
         setIsSignedIn((isSignedIn) => false);
@@ -31,7 +31,7 @@ export const UserState = ({ children }) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("orbit_user_data"));
-    console.log(user)
+    console.log(user);
     if (user?.authTokenExpiry <= Date.now() || !user) {
       userDispatch({ type: "signout" });
     } else {

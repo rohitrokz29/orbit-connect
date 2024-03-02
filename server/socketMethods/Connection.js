@@ -1,6 +1,7 @@
 const Connection = (socket) => {
 
     console.log(socket.id);
+    console.log("SOCKET CONNECTED")
     socket.on('room:start', ({ room, userId, password }) => {
         try {
             StartRoom({ room, organiserId: userId, password, socket });
