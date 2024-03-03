@@ -6,20 +6,27 @@ import History from "./components/History";
 import Meetings from "./components/Meetings";
 import JoinMeet from "./components/JoinMeet";
 import { UserContext } from "./context/UserContext";
-
+import { SocketState } from "./context/SocketContext";
 function App() {
   const { user, isSignedIn } = useContext(UserContext);
 
   return (
     <>
-
       <BrowserRouter>
         <Routes>
           {/* Home page */}
           <Route
             exact
             path="/"
-            element={isSignedIn ? <JoinMeet /> : <Home />}
+            element={
+              isSignedIn ? (
+                <SocketState>
+                  <JoinMeet />
+                </SocketState>
+              ) : (
+                <Home />
+              )
+            }
           />
 
           {/* HISTORY PAGE */}
@@ -27,7 +34,13 @@ function App() {
             exact
             path="/history"
             element={
-              isSignedIn ? <History /> : <Navigate to="/signin" replace />
+              isSignedIn ? (
+                <SocketState>
+                  <History />
+                </SocketState>
+              ) : (
+                <Navigate to="/signin" replace />
+              )
             }
           />
           {/* SIGNIN AND SIGNUP PAGE */}
@@ -57,7 +70,15 @@ function App() {
           {/* MEETING COMONENT */}
           <Route
             path="/meet/:roomId"
-            element={isSignedIn ? <Meetings /> : <Navigate to="/" replace />}
+            element={
+              isSignedIn ? (
+                <SocketState>
+                  <Meetings />
+                </SocketState>
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
           />
         </Routes>
       </BrowserRouter>
