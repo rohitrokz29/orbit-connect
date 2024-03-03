@@ -6,7 +6,7 @@ import React, {
   useReducer,
 } from "react";
 import { baseUrl, headers, properties } from "../assets/api";
-
+import { redirect } from "react-router";
 export const UserContext = createContext();
 
 export const UserState = ({ children }) => {
@@ -39,8 +39,20 @@ export const UserState = ({ children }) => {
     }
   }, []);
 
-  const Signup = ({ email, name, password }) => {
-    let res = fetch(`${baseUrl}signup`, {
+  const Signup = ({ email, name, password, confPassword }) => {
+    if (password.length < 10) {
+      setError("Choose a strong password");
+      return;
+    }
+    if (!email || !name) {
+      setError("Enter Valid Details");
+      return;
+    }
+    if (password !== confPassword) {
+      setError("Passwords Doesn't match");
+      return;
+    }
+    fetch(`${baseUrl}signup`, {
       method: "POST",
       properties,
       headers,
@@ -53,7 +65,7 @@ export const UserState = ({ children }) => {
             type: "signin",
             payload: { email, name, id: res.body.id },
           });
-          return;
+          return redirect("/");
         }
       })
       .catch((err) => {
@@ -62,7 +74,7 @@ export const UserState = ({ children }) => {
   };
 
   const Signin = ({ email, password }) => {
-    let res = fetch(`${baseUrl}signin`, {
+    fetch(`${baseUrl}signin`, {
       method: "POST",
       properties,
       headers,
@@ -75,7 +87,7 @@ export const UserState = ({ children }) => {
             type: "signin",
             payload: { email, name: res.body.name, id: res.body.id },
           });
-          return;
+          return redirect("/");
         }
       })
       .catch((err) => {
@@ -92,10 +104,10 @@ export const UserState = ({ children }) => {
       .then((res) => {
         if (res.status === 200) {
           userDispatch({ type: "signout" });
+          return redirect("/");
         }
       })
       .catch((err) => setError(err.message));
-    userDispatch({ type: "signout" });
   };
 
   return (

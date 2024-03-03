@@ -1,0 +1,57 @@
+body {
+    font-family: 'PT Sans', sans-serif;
+}
+
+
+a {
+    color: #333;
+}
+
+a:hover {
+    color: #da5767;
+    text-decoration: none;
+}
+
+.card {
+    border: 3px solid #4df7de;
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 2rem;
+    margin-inline: 10%;
+}
+
+.form-control {
+    background-color: #f8f9fa;
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.25rem;
+}
+
+.form-control:focus {
+
+    color: #000000;
+    background-color: #ffffff;
+    border: 3px solid #da5767;
+    outline: 0;
+    box-shadow: none;
+
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    background: #da5767;
+    border: 2px solid #da5767;
+}
+
+.btn-primary:hover {
+    background-color: #df8c96;
+    border-color: #df8c96;
+    transition: .3s;
+
+}
+
+.link {
+    font-weight: bold;
+}
