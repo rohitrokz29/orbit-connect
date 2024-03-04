@@ -16,6 +16,10 @@ export const UserState = ({ children }) => {
     console.log({ state, action });
     switch (action.type) {
       case "signin":
+        localStorage.setItem(
+          "orbit_user_data",
+          JSON.stringify(action["payload"])
+        );
         setIsSignedIn((isSignedIn) => true);
         return { user: action.payload };
       case "signout":
@@ -52,28 +56,38 @@ export const UserState = ({ children }) => {
       setError("Passwords Doesn't match");
       return;
     }
+    console.log({ email, name, password, confPassword });
+
     fetch(`${baseUrl}signup`, {
       method: "POST",
       properties,
       headers,
       body: JSON.stringify({ email, name, password }),
     })
-      .then((res) => res.json())
       .then((res) => {
-        if (res.status === 200) {
+        return res.json();
+      })
+      .then((res) => {
+        console.log(res);
+        if (res) {
           userDispatch({
             type: "signin",
-            payload: { email, name, id: res.body.id },
+            payload: { email, name, id: res.id },
           });
           return redirect("/");
         }
       })
       .catch((err) => {
         setError(err.message);
+        console.log(err);
       });
   };
 
   const Signin = ({ email, password }) => {
+    if (!email || !password) {
+      setError("Invalid Details");
+      return;
+    }
     fetch(`${baseUrl}signin`, {
       method: "POST",
       properties,

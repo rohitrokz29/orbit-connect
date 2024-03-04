@@ -2,7 +2,7 @@ import React from 'react'
 
 const JoinMeet = () => {
   return (
-    <div>JoinMeet</div>
+    <div>JOIN MEET</div>
   )
 }
 

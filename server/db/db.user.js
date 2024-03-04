@@ -3,15 +3,14 @@ const { database } = require('./db.connect');
 const { validate } = require('email-validator');
 const bcrypt = require('bcrypt');
 const { CreateToken } = require('../middlewares/token');
-const cookieEncrypter = require('cookie-encrypter');
 
 const cookieOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    // secure: true,
+    // sameSite: "none",
     signed: true,
     // secure: process.env.NODE_ENV === 'production',
-    expires: new Date(Date.now() + 24 * 3600 * 1000)
+    maxAge: 1000*30*24*60*60
 };
 /**
  * @param {String} name
@@ -20,6 +19,7 @@ const cookieOptions = {
  * @param {Object} res
  */
 const Signup = async (req, res) => {
+    console.log(req.body)
     const { name, email, password } = req.body;
     try {
         console.log({ name, email, password });
@@ -45,18 +45,19 @@ const Signup = async (req, res) => {
                     if (result?.affectedRows !== 1) {
                         return res.status(400).json({ message: "Server Error" });
                     }
-                    console.log(result)
-
+                    const token=CreateToken({id});
+                    console.log(token.accessToken)
+                    
                     return res
-                        .cookie('accessToken', CreateToken({ id }), cookieOptions)
+                        .cookie('accessToken', token.accessToken, cookieOptions)
                         .status(200)
                         .json({ id });
                 }
             )
         })
     } catch (error) {
-        return res.json({ message: "ERROR" });
         console.log(error)
+        return res.json({ message: "ERROR" });
     }
 }
 
@@ -84,7 +85,7 @@ const Signin = async (req, res) => {
                     console.log("done")
                     const token = CreateToken({ id: result[0].id })
                     return res
-                        .cookie("accessToken", token, cookieOptions)
+                        .cookie("accessToken", token.accessToken, cookieOptions)
                         .status(200)
                         .json({ id: result[0].id, name: result[0].name });
                 }

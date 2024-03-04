@@ -10,6 +10,12 @@ const Signin = ({ isSigninPage }) => {
   const passwordRef = useRef(null);
   const confPasswordRef = useRef(null);
   const handleSubmit = (e) => {
+    // console.log({
+    //   email: emailRef.current.value,
+    //   password: passwordRef.current.value,
+    //   name: nameRef.current.value,
+    //   confPassword: confPasswordRef.current.value,
+    // });
     e.preventDefault();
     if (isSigninPage) {
       Signin({
@@ -39,7 +45,7 @@ const Signin = ({ isSigninPage }) => {
                     <Link to="/">at Orbit Connect</Link>
                   </h2>
                   <div className="card-body py-md-4">
-                    <form onSubmit={handleSubmit}>
+                    <form>
                       <div className="form-group">
                         {!isSigninPage && (
                           <input
@@ -83,12 +89,18 @@ const Signin = ({ isSigninPage }) => {
                       </div>
                       <div className="buttons">
                         <Link
+                          id="link"
                           to={isSigninPage ? "/signup" : "/signin"}
                           className="link"
                         >
                           {isSigninPage ? "Signup" : "Signin"}
                         </Link>
-                        <button type="submit" className="button">
+                        <button
+                          id="submit-button"
+                          type="submit"
+                          className="button"
+                          onClick={handleSubmit}
+                        >
                           {isSigninPage
                             ? "Signin to Account"
                             : "Create Account"}
