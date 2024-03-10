@@ -4,7 +4,7 @@ import Home from "./components/Home";
 import Signin from "./components/Signin";
 import History from "./components/History";
 import Meetings from "./components/Meetings";
-import JoinMeet from "./components/JoinMeet";
+import Meets from "./components/Meets";
 import { UserContext } from "./context/UserContext";
 import { SocketState } from "./context/SocketContext";
 function App() {
@@ -21,7 +21,7 @@ function App() {
             element={
               isSignedIn ? (
                 <SocketState>
-                  <JoinMeet />
+                  <Meets />
                 </SocketState>
               ) : (
                 <Home />

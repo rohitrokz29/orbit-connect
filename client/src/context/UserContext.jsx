@@ -5,22 +5,26 @@ import React, {
   useState,
   useReducer,
 } from "react";
+import { Navigate } from "react-router-dom";
 import { baseUrl, headers, properties } from "../assets/api";
-import { redirect } from "react-router";
 export const UserContext = createContext();
 
+/**
+ * state={
+ * user:{
+ * email,name,id
+ * }
+ * }
+ */
 export const UserState = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [error, setError] = useState("");
   const userReducerFunction = (state, action) => {
-    console.log({ state, action });
     switch (action.type) {
       case "signin":
-        localStorage.setItem(
-          "orbit_user_data",
-          JSON.stringify(action["payload"])
-        );
+        localStorage.setItem("orbit_user_data", JSON.stringify(action.payload));
         setIsSignedIn((isSignedIn) => true);
+        <Navigate to="/" replace />;
         return { user: action.payload };
       case "signout":
         localStorage.clear();
@@ -60,7 +64,7 @@ export const UserState = ({ children }) => {
 
     fetch(`${baseUrl}signup`, {
       method: "POST",
-      properties,
+      credentials: properties.credentials,
       headers,
       body: JSON.stringify({ email, name, password }),
     })
@@ -68,13 +72,11 @@ export const UserState = ({ children }) => {
         return res.json();
       })
       .then((res) => {
-        console.log(res);
         if (res) {
           userDispatch({
             type: "signin",
             payload: { email, name, id: res.id },
           });
-          return redirect("/");
         }
       })
       .catch((err) => {
@@ -86,22 +88,25 @@ export const UserState = ({ children }) => {
   const Signin = ({ email, password }) => {
     if (!email || !password) {
       setError("Invalid Details");
+      console.log("error");
       return;
     }
     fetch(`${baseUrl}signin`, {
       method: "POST",
-      properties,
+      credentials: properties.credentials,
       headers,
       body: JSON.stringify({ email, password }),
     })
-      .then((res) => res.json())
       .then((res) => {
-        if (res.status === 200) {
+        return res.json();
+      })
+      .then((res) => {
+        console.log(res);
+        if (res) {
           userDispatch({
             type: "signin",
-            payload: { email, name: res.body.name, id: res.body.id },
+            payload: { email, name: res.name, id: res.id },
           });
-          return redirect("/");
         }
       })
       .catch((err) => {
@@ -111,14 +116,13 @@ export const UserState = ({ children }) => {
   const SignOut = () => {
     fetch(`${baseUrl}signout`, {
       method: "DELETE",
-      properties,
+      credentials: properties.credentials,
       headers,
     })
       .then((res) => res.json())
       .then((res) => {
-        if (res.status === 200) {
+        if (res) {
           userDispatch({ type: "signout" });
-          return redirect("/");
         }
       })
       .catch((err) => setError(err.message));

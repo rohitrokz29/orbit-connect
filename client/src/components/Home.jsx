@@ -6,14 +6,17 @@ import ConnectionImage from "../assets/images/securecon.jpeg";
 import MessageImage from "../assets/images/livemessage.jpeg";
 import DataImage from "../assets/images/dataSec.jpeg";
 import "./styles/home.css";
+
 const Home = () => {
   const { user, isSignedIn } = useContext(UserContext);
+
   const features = [
     { name: "Connect Globally", image: GlobeImage },
     { name: "Secure Connection", image: ConnectionImage },
     { name: "Live Messaging", image: MessageImage },
     { name: "Data Security", image: DataImage },
   ];
+
   return (
     <>
       <main>

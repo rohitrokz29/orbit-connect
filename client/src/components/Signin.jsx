@@ -3,19 +3,16 @@ import { Link } from "react-router-dom";
 import { SideImage } from "./Home";
 import { UserContext } from "../context/UserContext";
 import "./styles/sigin.css";
+
 const Signin = ({ isSigninPage }) => {
   const { Signin, Signup } = useContext(UserContext);
+
   const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const confPasswordRef = useRef(null);
+
   const handleSubmit = (e) => {
-    // console.log({
-    //   email: emailRef.current.value,
-    //   password: passwordRef.current.value,
-    //   name: nameRef.current.value,
-    //   confPassword: confPasswordRef.current.value,
-    // });
     e.preventDefault();
     if (isSigninPage) {
       Signin({
